@@ -1,10 +1,7 @@
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.select import Select
-from selenium.webdriver.common.action_chains import ActionChains
 import time
 import secrets
 import string
@@ -20,9 +17,23 @@ def pwd(pwd_length):
     for i in range(pwd_length):
         pwd += ''.join(secrets.choice(alphabet))
 
-    print(pwd)
     return pwd
 
+def cliking(browser, ruta):
+    browser.find_element(By.XPATH, ruta).click()
+    
+def sending(*args):
+    '''
+    args[0] = browser
+    args[1] = ruta
+    args[2] = dato 1 mensaje
+    args[3] = ENTER
+    '''
+    if len(args) == 3:
+        args[0].find_element(By.XPATH, args[1]).send_keys(args[2]) 
+    else:
+        args[0].find_element(By.XPATH, args[1]).send_keys(args[2] + args[3]) 
+    
 def configuration_browser(page):
     #Configuracion e ingreso a la pagina por medio de google chrome
     options = webdriver.ChromeOptions()
@@ -34,19 +45,18 @@ def configuration_browser(page):
     return browser
 
 def join_today(browser):
+    
+    cliking(browser, '/html/body/ui-view/unauthenticated-container/div/div/unauthenticated-header/div/div[3]/ul[2]/li[2]/a')
     print("Ingreso a Join Today")
-    browser.find_element(By.XPATH,
-                         '/html/body/ui-view/unauthenticated-container/div/div/unauthenticated-header/div/div[3]/ul[2]/li[2]/a')\
-        .click()
     time.sleep(2)
         
 def step_1(browser, first_name, last_name, email_address, dia, mes, año):
 
-    browser.find_element(By.XPATH, '//*[@id="firstName"]').send_keys(first_name)
+    sending(browser, '//*[@id="firstName"]', first_name)
     print(f"Escribe el nombre: {first_name}")
-    browser.find_element(By.XPATH, '//*[@id="lastName"]').send_keys(last_name)
+    sending(browser, '//*[@id="lastName"]', last_name)
     print(f"Escribe el apellido: {last_name}")
-    browser.find_element(By.XPATH, '//*[@id="email"]').send_keys(email_address)
+    sending(browser, '//*[@id="email"]', email_address)
     print(f"Escribe el correo electronico: {email_address}")
     Select(browser.find_element(By.ID, 'birthMonth')).select_by_value("number:" + str(mes))
     print(f"Escribe el mes de nacimiento: {mes}")
@@ -56,9 +66,7 @@ def step_1(browser, first_name, last_name, email_address, dia, mes, año):
     print(f"Escribe el año de nacimiento: {año}")
 
     time.sleep(1)
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[2]/a')\
-        .click()
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[2]/a')
 
 def step_2(browser, city, state, postal_code, country):
     
@@ -72,98 +80,69 @@ def step_2(browser, city, state, postal_code, country):
 
     time.sleep(0.5)
     browser.find_element(By.XPATH, '//*[@id="zip"]').clear()
-    browser.find_element(By.XPATH, '//*[@id="zip"]').send_keys(postal_code)
+    sending(browser, '//*[@id="zip"]', postal_code)
     print(f"Escribe el código postal: {postal_code}")
     
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div[1]/div[4]/div[2]/div/div/div[1]/span/span[2]')\
-        .click()
-    browser.find_element(By.XPATH,
-                             '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div[1]/div[4]/div[2]/div/div/input[1]')\
-            .send_keys(country + Keys.ENTER)
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div[1]/div[4]/div[2]/div/div/div[1]/span/span[2]')
+    
+    sending(browser,
+            '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[1]/div[3]/div[1]/div[4]/div[2]/div/div/input[1]',
+            country,
+            Keys.ENTER)
     print(f"Escribe el pais: {country}")
     time.sleep(1)
     
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[2]/div/a')\
-        .click()
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[2]/div/a')
+    
 
 def step_3(browser, computer, version, languague, mobile, modelo, op_sys):
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[1]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[1]/div[2]/div/input[1]')\
-        .send_keys(computer + Keys.ENTER)
+    
+    cliking(browser, '//*[@id="web-device"]/div[1]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="web-device"]/div[1]/div[2]/div/input[1]', computer, Keys.ENTER)
     print(f"Escribe el sistema operativo: {computer}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[2]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[2]/div[2]/div/input[1]')\
-        .send_keys(version + Keys.ENTER)
+    cliking(browser, '//*[@id="web-device"]/div[2]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="web-device"]/div[2]/div[2]/div/input[1]', version, Keys.ENTER)
     print(f"Escribe la version de {computer}: {version}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[3]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="web-device"]/div[3]/div[2]/div/input[1]')\
-        .send_keys(languague + Keys.ENTER)
-    print(f"Escribe Lenguaje del sistema operativo: {languague}")
+    cliking(browser, '//*[@id="web-device"]/div[3]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="web-device"]/div[3]/div[2]/div/input[1]', languague, Keys.ENTER)
+    print(f"Escribe el lenguaje del sistema operativo: {languague}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[1]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[1]/div[2]/div/input[1]')\
-        .send_keys(mobile + Keys.ENTER)
+    cliking(browser, '//*[@id="mobile-device"]/div[1]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="mobile-device"]/div[1]/div[2]/div/input[1]', mobile, Keys.ENTER)
     print(f"Escribe la marca del celular: {mobile}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[2]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[2]/div[2]/div/input[1]')\
-        .send_keys(modelo + Keys.ENTER)
-    print(f"Escribe el model del celular: {modelo}")
+    cliking(browser, '//*[@id="mobile-device"]/div[2]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="mobile-device"]/div[2]/div[2]/div/input[1]', modelo, Keys.ENTER)
+    print(f"Escribe el modelo del celular: {modelo}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[3]/div[2]/div/div[1]/span')\
-        .click()
-    browser.find_element(By.XPATH,
-                         '//*[@id="mobile-device"]/div[3]/div[2]/div/input[1]')\
-        .send_keys(op_sys + Keys.ENTER)
+    cliking(browser, '//*[@id="mobile-device"]/div[3]/div[2]/div/div[1]/span')
+    sending(browser, '//*[@id="mobile-device"]/div[3]/div[2]/div/input[1]', op_sys, Keys.ENTER)
     print(f"Escribe el sistema operativo del celular: {op_sys}")
     time.sleep(1)
 
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/div[2]/div/a')\
-        .click()    
-
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/div[2]/div/a')
+      
 def step_4(browser, pwd):
-    browser.find_element(By.XPATH, '//*[@id="password"]').send_keys(pwd)
+    sending(browser, '//*[@id="password"]', pwd)
     print(f"Escribe contraseña: \n{pwd}")
-    browser.find_element(By.XPATH, '//*[@id="confirmPassword"]').send_keys(pwd)
-    print(f"Escribe la confimacion de la contraseña: \n{pwd}")
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[4]/label/span')\
-                         .click()
+    sending(browser, '//*[@id="confirmPassword"]', pwd)
+    print(f"Escribe la confirmacion de la contraseña: \n{pwd}")
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[4]/label/span')
     print("✅ STAY INFORMED! ")
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[5]/label/span[1]')\
-                         .click()
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[5]/label/span[1]')
     print("✅ Terminos de uso")
-    browser.find_element(By.XPATH,
-                         '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[6]/label/span[1]')\
-                         .click()
+    cliking(browser, '//*[@id="regs_container"]/div/div[2]/div/div[2]/div/form/div[6]/label/span[1]')
     print("✅ Privacidad")
+    time.sleep(1)
+    cliking(browser, '//*[@id="laddaBtn"]')
+    print("\n Usuario creado")
 
 #Inicializacion de variables
 pagina = "https://utest.com/"
@@ -171,7 +150,7 @@ pagina = "https://utest.com/"
 # Variables step 1
 first_name = "Cristian"
 last_name = "Gonzalez"
-email_address = "alt.yi-3opk4lex@yopmail.com"
+email_address = "alt.z1-fix1snf@yopmail.com"
 dia = 13
 mes = 6
 año = 1991
@@ -193,7 +172,6 @@ op_sys = "iOS 16.1 Beta"
 # Variables step 4
 pwd_length = 60
 pwd = pwd(pwd_length)
-
 
 browser = configuration_browser(pagina)
 
